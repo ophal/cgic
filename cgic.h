@@ -87,6 +87,10 @@ typedef enum {
 	cgiFormEOF
 } cgiFormResultType;
 
+/* The cgic init function. */
+
+extern int cgiInit();
+
 /* These functions are used to retrieve form data. See
 	cgic.html for documentation. */
 
@@ -196,8 +200,6 @@ typedef enum {
 
 extern cgiEnvironmentResultType cgiWriteEnvironment(char *filename);
 extern cgiEnvironmentResultType cgiReadEnvironment(char *filename);
-
-extern int cgiMain();
 
 extern cgiFormResultType cgiFormEntries(
 	char ***ptrToStringArray);

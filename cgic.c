@@ -12,7 +12,7 @@
 #define CGICDEBUGSTART \
 	{ \
 		FILE *dout; \
-		dout = fopen("/home/boutell/public_html/debug", "a"); \
+		dout = fopen("/tmp/cgic_debug", "a"); \
 	
 #define CGICDEBUGEND \
 		fclose(dout); \
@@ -119,8 +119,7 @@ static void cgiFreeResources();
 static int cgiStrEqNc(char *s1, char *s2);
 static int cgiStrBeginsNc(char *s1, char *s2);
 
-int main(int argc, char *argv[]) {
-	int result;
+int cgiInit() {
 	char *cgiContentLengthString;
 	char *e;
 	cgiSetupConstants();
@@ -207,16 +206,6 @@ int main(int argc, char *argv[]) {
 	cgiRestored = 0;
 
 
-	/* These five lines keep compilers from
-		producing warnings that argc and argv
-		are unused. They have no actual function. */
-	if (argc) {
-		if (argv[0]) {
-			cgiRestored = 0;
-		}
-	}	
-
-
 	if (cgiStrEqNc(cgiRequestMethod, "post")) {
 #ifdef CGICDEBUG
 		CGICDEBUGSTART
@@ -284,9 +273,8 @@ int main(int argc, char *argv[]) {
 #endif /* CGICDEBUG */
 		}
 	}
-	result = cgiMain();
 	cgiFreeResources();
-	return result;
+	return 1;
 }
 
 static void cgiGetenv(char **s, char *var){
