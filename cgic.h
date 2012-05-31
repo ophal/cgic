@@ -87,10 +87,6 @@ typedef enum {
 	cgiFormEOF
 } cgiFormResultType;
 
-/* The cgic init function. */
-
-extern int cgiInit();
-
 /* These functions are used to retrieve form data. See
 	cgic.html for documentation. */
 
@@ -130,9 +126,6 @@ extern cgiFormResultType cgiFormSelectSingle(
 extern cgiFormResultType cgiFormSelectMultiple(
 	char *name, char **choicesText, int choicesTotal, 
 	int *result, int *invalid);
-
-/* Just an alias; users have asked for this */
-#define cgiFormSubmitClicked cgiFormCheckboxSingle
 
 extern cgiFormResultType cgiFormCheckboxSingle(
 	char *name);
