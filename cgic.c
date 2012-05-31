@@ -22,6 +22,9 @@
 #define CGICDEBUGEND
 #endif /* CGICDEBUG */
 
+#include <lua.h>
+#include <lauxlib.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -1859,7 +1862,11 @@ static int cgiWriteString(FILE *out, char *s);
 
 static int cgiWriteInt(FILE *out, int i);
 
-#define CGIC_VERSION "2.0"
+/* Version info */
+#define CGIC_VERSION "2.05"
+#define LIB_NAME "cgic"
+#define LIB_VERSION "lua-cgic " CGIC_VERSION "r1"
+#define LIB_COPYRIGHT LIB_VERSION " (c) 2012 Fernando Paredes García"
 
 cgiEnvironmentResultType cgiWriteEnvironment(char *filename) {
 	FILE *out;
@@ -2512,3 +2519,73 @@ cgiFormResultType cgiValueEscape(char *s)
 }
 
 
+/***
+ ** C-to-Lua bridge functions.
+ **/
+
+/**
+ * Calls.
+ */
+/* cgiInit(void *) */
+static int LcgiInit(lua_State *L) {
+  cgiInit();
+  return 0;
+}
+
+/* 1666: cgiFormCheckboxSingle(char *name) */
+static int LcgiFormCheckboxSingle(lua_State *L) {
+  void *name = (void*) luaL_checkstring(L, 1);
+  lua_pushinteger(L, cgiFormCheckboxSingle(name));
+  return 1;
+}
+
+/* 1857: cgiHeaderContentType(char *mimeType) */
+static int LcgiHeaderContentType(lua_State *L) {
+  void *mimeType = (void*) luaL_checkstring(L, 1);
+  cgiHeaderContentType(mimeType);
+  return 0;
+}
+
+/* 1191: cgiFormString(char *name, char *result, int max) */
+static int LcgiFormString(lua_State *L) {
+  void *name = (void*) luaL_checkstring(L, 1);
+  int max = luaL_checkinteger(L, 2);
+  char *result = malloc(luaL_checkinteger(L, 2));
+  cgiFormString(name, result, max);
+  lua_pushstring(L, result);
+  return 0;
+}
+
+/**
+ * Getters.
+ */
+
+/* cgiScriptName() */
+static int LcgiScriptName(lua_State *L) {
+  lua_pushstring(L, cgiScriptName);
+  return 1;
+}
+
+
+/***
+ ** Register CGIC Lua extension.
+ **/
+
+static struct luaL_Reg cgic[] = {
+  // Calls
+  {"init", LcgiInit},
+  {"formCheckboxSingle", LcgiFormCheckboxSingle},
+  {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
+  {"headerContentType", LcgiHeaderContentType},
+  {"formString", LcgiFormString},
+  // Getters
+  {"scriptName", LcgiScriptName},
+  {NULL, NULL}
+};
+
+LUALIB_API int luaopen_cgic(lua_State *L) {
+  luaL_register(L, LIB_NAME, cgic);
+  lua_pushinteger(L, cgiFormSuccess);
+  lua_setfield(L, -2, "formSuccess");
+  return 1;
+}
