@@ -59,11 +59,8 @@ function HandleSubmit()
 end
 
 function Name()
-	local name = ffi.new "char[81]"
-	cgic.cgiFormStringNoNewlines(ffi.cast("char *", "name"), name, 81);
-	print "Name: "
-	cgic.cgiHtmlEscape(name);
-	print "<BR>\n"
+	local name = cgic.cgiFormStringNoNewlines([[name]], 81);
+	print(([[Name: %s<BR>]]):format(cgic.htmlEscape(name)))
 end
 	
 --~ void Address() {
