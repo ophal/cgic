@@ -2532,6 +2532,16 @@ static int LcgiInit(lua_State *L) {
   return 0;
 }
 
+/* 1346: LcgiFormStringNoNewlines(char *name, char *result, int max) */
+static int LcgiFormStringNoNewlines(lua_State *L) {
+  void *name = (void*) luaL_checkstring(L, 1);
+  int max = luaL_checkinteger(L, 2);
+  char *result = malloc(max);
+  cgiFormStringNoNewlines(name, result, max);
+  lua_pushstring(L, result);
+  return 1;
+}
+
 /* 1666: cgiFormCheckboxSingle(char *name) */
 static int LcgiFormCheckboxSingle(lua_State *L) {
   void *name = (void*) luaL_checkstring(L, 1);
@@ -2550,10 +2560,18 @@ static int LcgiHeaderContentType(lua_State *L) {
 static int LcgiFormString(lua_State *L) {
   void *name = (void*) luaL_checkstring(L, 1);
   int max = luaL_checkinteger(L, 2);
-  char *result = malloc(luaL_checkinteger(L, 2));
+  char *result = malloc(max);
   cgiFormString(name, result, max);
   lua_pushstring(L, result);
   return 0;
+}
+
+/* 2494: cgiHtmlEscape(char *s) */
+static int LcgiHtmlEscape(lua_State *L) {
+  void *s = (void*) luaL_checkstring(L, 1);
+  cgiHtmlEscape(s);
+  lua_pushstring(L, s);
+  return 1;
 }
 
 /**
@@ -2574,10 +2592,12 @@ static int LcgiScriptName(lua_State *L) {
 static struct luaL_Reg cgic[] = {
   // Calls
   {"init", LcgiInit},
+  {"formStringNoNewlines", LcgiFormStringNoNewlines},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
   {"headerContentType", LcgiHeaderContentType},
   {"formString", LcgiFormString},
+  {"htmlEscape", LcgiHtmlEscape},
   // Getters
   {"scriptName", LcgiScriptName},
   {NULL, NULL}
