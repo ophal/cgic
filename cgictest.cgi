@@ -59,7 +59,7 @@ function HandleSubmit()
 end
 
 function Name()
-	local name = cgic.cgiFormStringNoNewlines([[name]], 81);
+	local name = cgic.formStringNoNewlines([[name]], 81);
 	print(([[Name: %s<BR>]]):format(cgic.htmlEscape(name)))
 end
 	
