@@ -7,7 +7,7 @@ export REQUEST_METHOD:= post
 export CONTENT_LENGTH:= 1342
 export CONTENT_TYPE:= multipart/form-data; boundary=-----------------------------8287539502325421911076543375
 
-all: cgic.so install
+all: cgic.so 
 
 install: cgic.so
 	cp cgic.so /usr/local/lib/lua/5.1/
