@@ -2609,6 +2609,13 @@ static int LcgiFormString(lua_State *L) {
   return 0;
 }
 
+/* 1912: cgiWriteEnvironment(char *filename) */
+static int LcgiWriteEnvironment(lua_State *L) {
+  void *filename = (void*) luaL_checkstring(L, 1);
+  cgiWriteEnvironment(filename);
+  return 0;
+}
+
 /* 2494: cgiHtmlEscape(char *s) */
 static int LcgiHtmlEscape(lua_State *L) {
   void *s = (void*) luaL_checkstring(L, 1);
@@ -2640,6 +2647,7 @@ static struct luaL_Reg cgic[] = {
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
   {"headerContentType", LcgiHeaderContentType},
   {"formString", LcgiFormString},
+  {"writeEnvironment", LcgiWriteEnvironment},
   {"htmlEscape", LcgiHtmlEscape},
   // Getters
   {"scriptName", LcgiScriptName},
