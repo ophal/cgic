@@ -3,9 +3,12 @@
 require [[cgic]]
 
 local strlen = string.len
-local SERVER_NAME = os.getenv [[SERVER_NAME]]
 
 cgic.init()
+
+local SERVER_NAME = os.getenv [[SERVER_NAME]]
+local SCRIPT_NAME = cgic.scriptName() or [[]]
+--~ local SCRIPT_NAME = [[capture.cgi]]
 
 function cgiMain()
 	-- Load a previously saved CGI scenario if that button has been
@@ -34,7 +37,6 @@ function cgiMain()
 	ShowForm()
 	-- Finish up the page
 	print [[</BODY></HTML>]]
-	return 0
 end
 
 function HandleSubmit()
@@ -313,7 +315,7 @@ end
 --~ 
 function ShowForm()
 	print(([[<!-- 2.0: multipart/form-data is required for file uploads. -->
-<form method="POST" enctype="multipart/form-data" action="%s">]]):format(cgic.scriptName() or [[]]))
+<form method="POST" enctype="multipart/form-data" action="%s">]]):format(SCRIPT_NAME))
 print [[<p>
 Text Field containing Plaintext
 <p>
