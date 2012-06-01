@@ -17,7 +17,7 @@ cgic.so:
 	$(CC) -shared -O3 cgic.o -o cgic.so
 
 test:
-	./cgictest.cgi < post.txt
+	./test/index.cgi < post.txt
 
 clean:
 	rm -f *.o *.so
