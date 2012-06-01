@@ -2,7 +2,7 @@ CFLAGS=-g -Wall
 LUA_CFLAGS=`pkg-config lua5.1 --cflags`
 CC=gcc
 
-export SCRIPT_NAME:= cgictest.cgi
+export SCRIPT_NAME:= index.cgi
 export REQUEST_METHOD:= post
 export CONTENT_LENGTH:= 1342
 export CONTENT_TYPE:= multipart/form-data; boundary=-----------------------------8287539502325421911076543375
@@ -17,7 +17,8 @@ cgic.so:
 	$(CC) -shared -O3 cgic.o -o cgic.so
 
 test:
-	./test/index.cgi < post.txt
+	./tests/index.cgi < tests/post.dat
 
 clean:
 	rm -f *.o *.so
+
