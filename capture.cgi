@@ -1,12 +1,16 @@
-#include "cgic.h"
+#!/usr/bin/env luajit
 
-int cgiMain() {
-	cgiWriteEnvironment("/CHANGE/THIS/PATH/capcgi.dat");
-	cgiHeaderContentType("text/html");
-	fprintf(cgiOut, "<title>Captured</title>\n");
-	fprintf(cgiOut, "<h1>Captured</h1>\n");
-	fprintf(cgiOut, "Your form submission was captured for use in\n");
-	fprintf(cgiOut, "debugging CGI code.\n");
-	return 0;
-}
+require [[cgic]]
 
+cgic.init()
+
+function cgiMain()
+  cgic.writeEnvironment [[/tmp/cgic_capture.dat]]
+  cgic.headerContentType [[text/html]]
+  print [[<title>Captured</title>
+<h1>Captured</h1>
+Your form submission was captured for use in
+debugging CGI code.]]
+end
+
+cgiMain()
