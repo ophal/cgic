@@ -1,0 +1,16 @@
+All CGIC-Lua code is Copyright 2012 by Fernando Paredes García <fernando@develcuy.com>
+
+NOTICE
+------
+This software is a fork of CGIC library, with permission granted by its
+"Basic License" below:
+
+CGIC, copyright 1996-2011 by Thomas Boutell and Boutell.Com, Inc. Permission 
+is granted to use CGIC in any application, commercial or noncommercial, at no 
+cost. HOWEVER, this copyright paragraph must appear on a "credits" page 
+accessible in the public online and offline documentation of the program. 
+Modified versions of the CGIC library should not be distributed without 
+the attachment of a clear statement regarding the author of the 
+modifications, and this notice may in no case be removed. 
+Modifications may also be submitted to the author for inclusion 
+in the main CGIC distribution.
