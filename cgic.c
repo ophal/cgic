@@ -97,7 +97,7 @@ typedef enum {
  * VALUES. Make local copies if modifications are desired.
  */
 typedef struct cgiFormEntryStruct {
-        char *attr;
+  char *attr;
   // value is populated for regular form fields only.
   // For file uploads, it points to an empty string, and file
   // upload data should be read from the file tfileName. */ 
@@ -110,9 +110,9 @@ typedef struct cgiFormEntryStruct {
   int valueLength;
   char *fileName;  
   char *contentType;
-  /* Temporary file name for working storage of file uploads. */
+  // Temporary file name for working storage of file uploads.
   char *tfileName;
-        struct cgiFormEntryStruct *next;
+  struct cgiFormEntryStruct *next;
 } cgiFormEntry;
 
 // The first form entry.
