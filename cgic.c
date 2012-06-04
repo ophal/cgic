@@ -2577,9 +2577,9 @@ static int LcgiInit(lua_State *L) {
 
 /* 1346: LcgiFormStringNoNewlines(char *name, char *result, int max) */
 static int LcgiFormStringNoNewlines(lua_State *L) {
-  void *name = (void*) luaL_checkstring(L, 1);
+  char *name = (char*) luaL_checkstring(L, 1);
   int max = luaL_checkinteger(L, 2);
-  char *result = malloc(max);
+  char result[max];
   cgiFormStringNoNewlines(name, result, max);
   lua_pushstring(L, result);
   return 1;
@@ -2587,23 +2587,23 @@ static int LcgiFormStringNoNewlines(lua_State *L) {
 
 /* 1666: cgiFormCheckboxSingle(char *name) */
 static int LcgiFormCheckboxSingle(lua_State *L) {
-  void *name = (void*) luaL_checkstring(L, 1);
+  char *name = (char*) luaL_checkstring(L, 1);
   lua_pushinteger(L, cgiFormCheckboxSingle(name));
   return 1;
 }
 
 /* 1857: cgiHeaderContentType(char *mimeType) */
 static int LcgiHeaderContentType(lua_State *L) {
-  void *mimeType = (void*) luaL_checkstring(L, 1);
+  char *mimeType = (char*) luaL_checkstring(L, 1);
   cgiHeaderContentType(mimeType);
   return 0;
 }
 
 /* 1191: cgiFormString(char *name, char *result, int max) */
 static int LcgiFormString(lua_State *L) {
-  void *name = (void*) luaL_checkstring(L, 1);
+  char *name = (char*) luaL_checkstring(L, 1);
   int max = luaL_checkinteger(L, 2);
-  char *result = malloc(max);
+  char result[max];
   cgiFormString(name, result, max);
   lua_pushstring(L, result);
   return 0;
@@ -2611,14 +2611,14 @@ static int LcgiFormString(lua_State *L) {
 
 /* 1912: cgiWriteEnvironment(char *filename) */
 static int LcgiWriteEnvironment(lua_State *L) {
-  void *filename = (void*) luaL_checkstring(L, 1);
+  char *filename = (char*) luaL_checkstring(L, 1);
   cgiWriteEnvironment(filename);
   return 0;
 }
 
 /* 2494: cgiHtmlEscape(char *s) */
 static int LcgiHtmlEscape(lua_State *L) {
-  void *s = (void*) luaL_checkstring(L, 1);
+  char *s = (char*) luaL_checkstring(L, 1);
   cgiHtmlEscape(s);
   lua_pushstring(L, s);
   return 1;
