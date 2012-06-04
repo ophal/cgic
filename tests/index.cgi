@@ -65,14 +65,12 @@ function Name()
 	print(([[Name: %s<BR>]]):format(cgic.htmlEscape(name)))
 end
 	
---~ void Address() {
-	--~ char address[241];
-	--~ cgiFormString("address", address, 241);
-	--~ fprintf(cgic.cgiOut, "Address: <PRE>\n");
-	--~ cgiHtmlEscape(address);
-	--~ fprintf(cgic.cgiOut, "</PRE>\n");
---~ }
---~ 
+function Address()
+  local address = cgic.formString([[address]], 241)
+  print(([[Address: <PRE>
+%s</PRE>]]):format(cgic.htmlEscape(address)))
+end
+
 --~ void Hungry() {
 	--~ if (cgiFormCheckboxSingle("hungry") == cgiFormSuccess) {
 		--~ fprintf(cgic.cgiOut, "I'm Hungry!<BR>\n");
