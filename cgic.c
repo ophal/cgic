@@ -2619,7 +2619,7 @@ static int LcgiFormString(lua_State *L) {
   char result[max];
   cgiFormString(name, result, max);
   lua_pushstring(L, result);
-  return 0;
+  return 1;
 }
 
 /* 1912: cgiWriteEnvironment(char *filename) */
