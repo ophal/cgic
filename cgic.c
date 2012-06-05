@@ -2280,7 +2280,7 @@ static int cgiReadString(FILE *in, char **s) {
   *s = (char *) malloc(len + 1);
   if (!(*s)) {
     return 0;
-  }  
+  }
   if (((int) fread(*s, 1, len, in)) != len) {
     return 0;
   }
@@ -2498,33 +2498,46 @@ skipSecondValue2:
       return cgiFormIO; \
     } \
   } 
-
+// TODO: improve performance, realloc() is slow
 cgiFormResultType cgiHtmlEscapeData(char *data, int len) {
+  char *new_data;
+  new_data = malloc(0);
+  int pos = 0;
   while (len--) {
     if (*data == '<') {
-      TRYPUTC('&');
-      TRYPUTC('l');
-      TRYPUTC('t');
-      TRYPUTC(';');
+      pos = pos + 4;
+      new_data = realloc(new_data, pos);
+      new_data[pos - 4] = '&';
+      new_data[pos - 3] = 'l';
+      new_data[pos - 2] = 't';
+      new_data[pos - 1] = ';';
     }
     else if (*data == '&') {
-      TRYPUTC('&');
-      TRYPUTC('a');
-      TRYPUTC('m');
-      TRYPUTC('p');
-      TRYPUTC(';');
+      pos = pos + 5;
+      new_data = realloc(new_data, pos);
+      new_data[pos - 4] = '&';
+      new_data[pos - 4] = 'a';
+      new_data[pos - 3] = 'm';
+      new_data[pos - 2] = 'p';
+      new_data[pos - 1] = ';';
     }
     else if (*data == '>') {
-      TRYPUTC('&');
-      TRYPUTC('g');
-      TRYPUTC('t');
-      TRYPUTC(';');
+      pos = pos + 4;
+      new_data = realloc(new_data, pos);
+      new_data[pos - 4] = '&';
+      new_data[pos - 3] = 'g';
+      new_data[pos - 2] = 't';
+      new_data[pos - 1] = ';';
     }
     else {
-      TRYPUTC(*data);
+      pos++;
+      new_data = realloc(new_data, pos);
+      new_data[pos] = *data;
     }
     data++;
   }
+  new_data[pos++] = 0; // truncate
+  strcpy(data, new_data);
   return cgiFormSuccess;
 }
 
