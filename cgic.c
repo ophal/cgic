@@ -2618,6 +2618,32 @@ static int LcgiFormStringNoNewlines(lua_State *L) {
   return 1;
 }
 
+/* 1552: cgiFormResultType cgiFormInteger(
+  char *name, int *result, int defaultV
+)*/
+static int LcgiFormInteger(lua_State *L) {
+  char *name = (char*) luaL_checkstring(L, 1);
+  int defaultV = luaL_checkint(L, 2);
+  int result;
+  cgiFormInteger(name, &result, defaultV);
+  lua_pushinteger(L, result);
+  return 1;
+}
+
+/* 1620: cgiFormDoubleBounded(
+  char *name, double *result, double min, double max, double defaultV
+)*/
+static int LcgiFormDoubleBounded(lua_State *L) {
+  char *name = (char*) luaL_checkstring(L, 1);
+  double min = luaL_checknumber(L, 2);
+  double max = luaL_checknumber(L, 3);
+  double defaultV = luaL_checknumber(L, 4);
+  double result;
+  cgiFormDoubleBounded(name, &result, min, max, defaultV);
+  lua_pushnumber(L, result);
+  return 1;
+}
+
 /* 1715: cgiFormCheckboxSingle(char *name) */
 static int LcgiFormCheckboxSingle(lua_State *L) {
   char *name = (char*) luaL_checkstring(L, 1);
@@ -2679,6 +2705,8 @@ static struct luaL_Reg cgic[] = {
   // Calls
   {"init", LcgiInit},
   {"formStringNoNewlines", LcgiFormStringNoNewlines},
+  {"formInteger", LcgiFormInteger},
+  {"formDoubleBounded", LcgiFormDoubleBounded},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
   {"headerCookieSetString", LcgiHeaderCookieSetString},
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
