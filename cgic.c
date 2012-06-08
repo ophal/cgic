@@ -2499,50 +2499,60 @@ skipSecondValue2:
     } \
   } 
 // TODO: improve performance, realloc() is slow
-cgiFormResultType cgiHtmlEscapeData(char *data, int len) {
-  char *new_data;
-  new_data = malloc(0);
-  int pos = 0;
+cgiFormResultType cgiHtmlEscapeData(char **data, int len) {
+  int cs = 256; // chunk size
+  int cn = 0; // number of chunks
+  char *s = *data; // data
+  char *e = malloc(0); // escaped data
+  int p = -1; // pointer
+
   while (len--) {
-    if (*data == '<') {
-      pos = pos + 4;
-      new_data = realloc(new_data, pos);
-      new_data[pos - 4] = '&';
-      new_data[pos - 3] = 'l';
-      new_data[pos - 2] = 't';
-      new_data[pos - 1] = ';';
+    // Resize string
+    if (p >= cs*cn - 6) {
+      cn++;
+      e = realloc(e, cn*cs);
+      if (!e) {
+        return cgiFormIO;
+      }
     }
-    else if (*data == '&') {
-      pos = pos + 5;
-      new_data = realloc(new_data, pos);
-      new_data[pos - 4] = '&';
-      new_data[pos - 4] = 'a';
-      new_data[pos - 3] = 'm';
-      new_data[pos - 2] = 'p';
-      new_data[pos - 1] = ';';
+    // Escape string
+    if (*s == '<') {
+      p = p + 4;
+      e[p - 3] = '&';
+      e[p - 2] = 'l';
+      e[p - 1] = 't';
+      e[p] = ';';
     }
-    else if (*data == '>') {
-      pos = pos + 4;
-      new_data = realloc(new_data, pos);
-      new_data[pos - 4] = '&';
-      new_data[pos - 3] = 'g';
-      new_data[pos - 2] = 't';
-      new_data[pos - 1] = ';';
+    else if (*s == '&') {
+      p = p + 5;
+      e[p - 4] = '&';
+      e[p - 3] = 'a';
+      e[p - 2] = 'm';
+      e[p - 1] = 'p';
+      e[p] = ';';
+    }
+    else if (*s == '>') {
+      p = p + 4;
+      e[p - 3] = '&';
+      e[p - 2] = 'g';
+      e[p - 1] = 't';
+      e[p] = ';';
     }
     else {
-      pos++;
-      new_data = realloc(new_data, pos);
-      new_data[pos] = *data;
+      p++;
+      e[p] = *s;
     }
-    data++;
+    s++;
   }
-  new_data[pos++] = 0; // truncate
-  strcpy(data, new_data);
+  // Copy escaped data
+  *data = malloc(p);
+  strcpy(*data, e);
+  free(e);
   return cgiFormSuccess;
 }
 
-cgiFormResultType cgiHtmlEscape(char *s) {
-  return cgiHtmlEscapeData(s, (int) strlen(s));
+cgiFormResultType cgiHtmlEscape(char **s) {
+  return cgiHtmlEscapeData(s, (int) strlen(*s));
 }
 
 /**
@@ -2645,7 +2655,7 @@ static int LcgiWriteEnvironment(lua_State *L) {
 /* 2494: cgiHtmlEscape(char *s) */
 static int LcgiHtmlEscape(lua_State *L) {
   char *s = (char*) luaL_checkstring(L, 1);
-  cgiHtmlEscape(s);
+  cgiHtmlEscape(&s);
   lua_pushstring(L, s);
   return 1;
 }
