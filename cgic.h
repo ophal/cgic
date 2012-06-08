@@ -242,7 +242,7 @@ extern cgiFormResultType cgiFormEntries(char ***ptrToStringArray);
  * 's' is null-terminated. Returns cgiFormIO in the event
  * of error, cgiFormSuccess otherwise.
  */
-cgiFormResultType cgiHtmlEscape(char *s);
+cgiFormResultType cgiHtmlEscape(char **s);
 
 /**
  * Output data with the <, &, and > characters HTML-escaped. 
@@ -250,7 +250,7 @@ cgiFormResultType cgiHtmlEscape(char *s);
  * bytes in 'data'. Returns cgiFormIO in the event
  * of error, cgiFormSuccess otherwise.
  */
-cgiFormResultType cgiHtmlEscapeData(char *data, int len);
+cgiFormResultType cgiHtmlEscapeData(char **data, int len);
 
 /**
  * Output string with the " character HTML-escaped, and no
