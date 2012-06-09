@@ -2543,7 +2543,7 @@ cgiFormResultType cgiHtmlEscapeData(char **data, int len) {
     }
     s++;
   }
-  e[p++] = '\0';
+  e[++p] = '\0';
   // Copy escaped data
   *data = malloc(p);
   strcpy(*data, e);
