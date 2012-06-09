@@ -123,7 +123,7 @@ static cgiParseResultType cgiParsePostFormInput();
 static cgiParseResultType cgiParsePostMultipartInput();
 static cgiParseResultType cgiParseFormInput(char *data, int length);
 static void cgiSetupConstants();
-static void cgiFreeResources();
+static void cgiExit();
 static int cgiStrEqNc(char *s1, char *s2);
 static int cgiStrBeginsNc(char *s1, char *s2);
 
@@ -235,7 +235,7 @@ int cgiInit() {
         fprintf(dout, "PostFormInput failed\n");
         CGICDEBUGEND  
 #endif // CGICDEBUG
-        cgiFreeResources();
+        cgiExit();
         return -1;
       }  
 #ifdef CGICDEBUG
@@ -256,7 +256,7 @@ int cgiInit() {
         fprintf(dout, "PostMultipartInput failed\n");
         CGICDEBUGEND  
 #endif // CGICDEBUG
-        cgiFreeResources();
+        cgiExit();
         return -1;
       }  
 #ifdef CGICDEBUG
@@ -276,7 +276,7 @@ int cgiInit() {
       fprintf(dout, "GetFormInput failed\n");
       CGICDEBUGEND  
 #endif // CGICDEBUG
-      cgiFreeResources();
+      cgiExit();
       return -1;
     }
     else {  
@@ -287,7 +287,6 @@ int cgiInit() {
 #endif // CGICDEBUG
     }
   }
-  cgiFreeResources();
   return 1;
 }
 
@@ -1170,7 +1169,7 @@ static void cgiSetupConstants() {
   cgiHexValue['f'] = 15;
 }
 
-static void cgiFreeResources() {
+static void cgiExit() {
   cgiFormEntry *c = cgiFormEntryFirst;
   cgiFormEntry *n;
   while (c) {
@@ -2067,7 +2066,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
   // Prevent compiler warnings
   cgiEnvironmentResultType result = cgiEnvironmentIO;
   // Free any existing data first
-  cgiFreeResources();
+  cgiExit();
   // Be sure to open in binary mode
   in = fopen(filename, "rb");
   if (!in) {
@@ -2153,7 +2152,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
     int fileFlag;
     e = (cgiFormEntry *) calloc(1, sizeof(cgiFormEntry));
     if (!e) {
-      cgiFreeResources();
+      cgiExit();
       fclose(in);
       return cgiEnvironmentMemory;
     }
@@ -2248,7 +2247,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
 outOfMemory:
   result = cgiEnvironmentMemory;
 error:
-  cgiFreeResources();
+  cgiExit();
   fclose(in);
   if (e) {
     if (e->attr) {
@@ -2599,6 +2598,12 @@ static int LcgiInit(lua_State *L) {
   return 0;
 }
 
+/* cgiExit(void *) */
+static int LcgiExit(lua_State *L) {
+  cgiExit();
+  return 0;
+}
+
 /* 1225: cgiFormString(char *name, char *result, int max) */
 static int LcgiFormString(lua_State *L) {
   char *name = (char*) luaL_checkstring(L, 1);
@@ -2734,6 +2739,7 @@ static int LcgiScriptName(lua_State *L) {
 static struct luaL_Reg cgic[] = {
   // Calls
   {"init", LcgiInit},
+  {"exit", LcgiExit},
   {"formStringNoNewlines", LcgiFormStringNoNewlines},
   {"formInteger", LcgiFormInteger},
   {"formDoubleBounded", LcgiFormDoubleBounded},
