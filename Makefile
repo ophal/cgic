@@ -4,7 +4,7 @@ CC=gcc
 
 export SCRIPT_NAME:= index.cgi
 export REQUEST_METHOD:= post
-export CONTENT_LENGTH:= 1404
+export CONTENT_LENGTH:= 1397
 export CONTENT_TYPE:= multipart/form-data; boundary=---------------------------1544642457600615447237782214
 
 all: cgic.so 

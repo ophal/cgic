@@ -13,7 +13,7 @@ on
 -----------------------------1544642457600615447237782214
 Content-Disposition: form-data; name="temperature"
 
-98.6
+86.9
 -----------------------------1544642457600615447237782214
 Content-Disposition: form-data; name="frogs"
 
@@ -21,7 +21,7 @@ Content-Disposition: form-data; name="frogs"
 -----------------------------1544642457600615447237782214
 Content-Disposition: form-data; name="colors"
 
-Red
+Green
 -----------------------------1544642457600615447237782214
 Content-Disposition: form-data; name="age"
 
@@ -40,7 +40,7 @@ Content-Disposition: form-data; name="cvalue"
 
 somevalue
 -----------------------------1544642457600615447237782214
-Content-Disposition: form-data; name="saveenvironment"
+Content-Disposition: form-data; name="testcgic"
 
-Save Environment
+Submit Request
 -----------------------------1544642457600615447237782214--
