@@ -1,10 +1,8 @@
-#!/usr/bin/env luajit
+#!/usr/bin/env lua
 
 require [[cgic]]
 
 local strlen = string.len
-
-cgic.init()
 
 local SERVER_NAME = os.getenv [[SERVER_NAME]]
 local SCRIPT_NAME = cgic.scriptName() or [[]]
@@ -41,11 +39,11 @@ end
 
 function HandleSubmit()
 	Name()
-	--~ Address()
-	--~ Hungry()
-	--~ Temperature()
-	--~ Frogs()
-	--~ Color()
+	Address()
+	Hungry()
+	Temperature()
+	Frogs()
+	Color()
 	--~ Flavors()
 	--~ NonExButtons()
 	--~ RadioButtons()
@@ -66,43 +64,44 @@ function Name()
 end
 	
 function Address()
-  local address = cgic.formString([[address]], 241)
+  local address = cgic.formString([[address]], 241) or ""
   print(([[Address: <PRE>
 %s</PRE>]]):format(cgic.htmlEscape(address)))
 end
 
---~ void Hungry() {
-	--~ if (cgiFormCheckboxSingle("hungry") == cgiFormSuccess) {
-		--~ fprintf(cgic.cgiOut, "I'm Hungry!<BR>\n");
-	--~ } else {
-		--~ fprintf(cgic.cgiOut, "I'm Not Hungry!<BR>\n");
-	--~ }
---~ }
-	--~ 
---~ void Temperature() {
-	--~ double temperature;
-	--~ cgiFormDoubleBounded("temperature", &temperature, 80.0, 120.0, 98.6);
-	--~ fprintf(cgic.cgiOut, "My temperature is %f.<BR>\n", temperature);
---~ }
-	--~ 
---~ void Frogs() {
-	--~ int frogsEaten;
-	--~ cgiFormInteger("frogs", &frogsEaten, 0);
-	--~ fprintf(cgic.cgiOut, "I have eaten %d frogs.<BR>\n", frogsEaten);
---~ }
---~ 
---~ char *colors[] = {
-	--~ "Red",
-	--~ "Green",
-	--~ "Blue"
---~ };
---~ 
---~ void Color() {
-	--~ int colorChoice;
-	--~ cgiFormSelectSingle("colors", colors, 3, &colorChoice, 0);
-	--~ fprintf(cgic.cgiOut, "I am: %s<BR>\n", colors[colorChoice]);
---~ }	 
---~ 
+function Hungry()
+	if cgic.formCheckboxSingle [[hungry]] == cgic.formSuccess then
+		print [[I'm Hungry!<BR>
+]]
+	else
+		print [[I'm Not Hungry!<BR>
+]]
+	end
+end
+
+function Temperature()
+	local temperature = cgic.formDoubleBounded([[temperature]], 80.0, 120.0, 98.6)
+	print(([[My temperature is %f.<BR>
+]]):format(temperature))
+end
+	
+function Frogs()
+	local frogsEaten = cgic.formInteger([[frogs]], 0)
+	print(([[I have eaten %i frogs.<BR>
+]]):format(frogsEaten))
+end
+
+function Color()
+  local colors = {
+    [[Red]],
+    [[Green]],
+    [[Blue]],
+  }
+	local colorChoice = cgic.formSelectSingle([[colors]], colors, 0)
+	print(([[I am: %s<BR>
+]]):format(colors[colorChoice]))
+end
+
 --~ char *flavors[] = {
 	--~ "pistachio",
 	--~ "walnut",
@@ -387,13 +386,13 @@ function CookieSet()
 		-- to get rid of it, which may be immediately),
     -- and applies only to this script on this site.
 		cgic.headerCookieSetString(cname, cvalue,
-			86400, cgic.scriptName, SERVER_NAME)
+			86400, cgic.scriptName() or [[]], SERVER_NAME or [[]])
 	end
 end
 
 function LoadEnvironment()
 	if cgic.readEnvironment(SAVED_ENVIRONMENT) ~= cgic.environmentSuccess then
-		cgic.headerContentType(ffi.cast([[char *]], [[text/html]]))
+		cgic.headerContentType [[text/html]]
 		print [[<head>Error</head>
 <body><h1>Error</h1>
 cgiReadEnvironment failed. Most likely you have not saved an environment yet.]]
@@ -424,4 +423,6 @@ end
 	--~ }
 --~ }
 
+cgic.init()
 cgiMain()
+cgic.exit()
