@@ -1,7 +1,7 @@
 /**
- * The CGIC-Lua extension by Fernando Paredes García.
+ * The Lua-CGIC extension by Fernando Paredes García.
  *
- * CGIC-Lua is intended to be a high-quality API to simplify CGI
+ * Lua-CGIC is intended to be a high-quality API to simplify CGI
  * programming tasks.
  *
  * Based on CGI_C library - (c) Thomas Boutell and Boutell.Com, Inc. 1996-2011
