@@ -2645,6 +2645,35 @@ static int LcgiFormDoubleBounded(lua_State *L) {
   return 1;
 }
 
+/* 1638: cgiFormResultType cgiFormSelectSingle(
+  char *name, char **choicesText, int choicesTotal, 
+  int *result, int defaultV
+)*/
+static int LcgiFormSelectSingle(lua_State *L) {
+  char *name = (char *) luaL_checkstring(L, 1);
+
+  // Start: Copy lua table to C array
+  int index = 2;
+  luaL_checktype(L, index, LUA_TTABLE);
+  int size = lua_objlen(L, index);
+  char *choicesText[size];
+  int i;
+  for (i=1; i<=size; i++) {
+    lua_pushinteger(L, i);
+    lua_gettable(L, - (1 + index));
+    choicesText[i - 1] = (char *) lua_tostring(L, -1);
+    lua_pop(L, 1);
+  }
+  // End: Copy lua table to C array
+
+  int defaultV = luaL_checkint(L, 3);
+  int choicesTotal = 3; // TODO
+  int result;
+  cgiFormSelectSingle(name, choicesText, choicesTotal, &result, defaultV);
+  lua_pushinteger(L, ++result);
+  return 1;
+}
+
 /* 1715: cgiFormCheckboxSingle(char *name) */
 static int LcgiFormCheckboxSingle(lua_State *L) {
   char *name = (char*) luaL_checkstring(L, 1);
@@ -2708,6 +2737,7 @@ static struct luaL_Reg cgic[] = {
   {"formStringNoNewlines", LcgiFormStringNoNewlines},
   {"formInteger", LcgiFormInteger},
   {"formDoubleBounded", LcgiFormDoubleBounded},
+  {"formSelectSingle", LcgiFormSelectSingle},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
   {"headerCookieSetString", LcgiHeaderCookieSetString},
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
