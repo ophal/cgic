@@ -144,10 +144,9 @@ extern cgiFormResultType cgiFormDoubleBounded(
 );
 
 extern cgiFormResultType cgiFormSelectSingle(
-	char *name, char **choicesText, int choicesTotal, 
+	char *name, lua_State *L, int index, int choicesTotal, 
 	int *result, int defaultV
-);	
-
+);
 
 extern cgiFormResultType cgiFormSelectMultiple(
 	char *name, char **choicesText, int choicesTotal, 
@@ -163,7 +162,7 @@ extern cgiFormResultType cgiFormCheckboxMultiple(
 	int *result, int *invalid);
 
 extern cgiFormResultType cgiFormRadio(
-	char *name, char **valuesText, int valuesTotal, 
+	char *name, lua_State *L, int index, int valuesTotal, 
 	int *result, int defaultV
 );	
 

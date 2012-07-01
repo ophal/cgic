@@ -1635,7 +1635,7 @@ cgiFormResultType cgiFormDoubleBounded(
 }
 
 cgiFormResultType cgiFormSelectSingle(
-  char *name, char **choicesText, int choicesTotal, 
+  char *name, lua_State *L, int index, int choicesTotal, 
   int *result, int defaultV
 ) {
   cgiFormEntry *e;
@@ -1650,13 +1650,15 @@ cgiFormResultType cgiFormSelectSingle(
     *result = defaultV;
     return cgiFormNotFound;
   }
-  for (i=0; (i < choicesTotal); i++) {
+  for (i=1; (i <= choicesTotal); i++) {
 #ifdef CGICDEBUG
     CGICDEBUGSTART
-    fprintf(dout, "%s %s\n", choicesText[i], e->value);
+    fprintf(dout, "%s %s\n", (char *) lua_tostring(L, -1), e->value);
     CGICDEBUGEND
 #endif // CGICDEBUG
-    if (cgiStrEq(choicesText[i], e->value)) {
+    lua_pushinteger(L, i);
+    lua_gettable(L, - (1 + index));
+    if (cgiStrEq((char *) lua_tostring(L, -1), e->value)) {
 #ifdef CGICDEBUG
       CGICDEBUGSTART
       fprintf(dout, "MATCH\n");
@@ -1665,6 +1667,7 @@ cgiFormResultType cgiFormSelectSingle(
       *result = i;
       return cgiFormSuccess;
     }
+    lua_pop(L, 1);
   }
   *result = defaultV;
   return cgiFormNoSuchChoice;
@@ -1730,16 +1733,6 @@ extern cgiFormResultType cgiFormCheckboxMultiple(
   );
 }
 
-cgiFormResultType cgiFormRadio(
-  char *name, char **valuesText, int valuesTotal,
-  int *result, int defaultV
-) {
-  // Implementation is identical to cgiFormSelectSingle.
-  return cgiFormSelectSingle(
-    name, valuesText, valuesTotal, result, defaultV
-  );
-}
-
 cgiFormResultType cgiCookieString(char *name, char *value, int space) {
   char *p = cgiCookie;
   while (*p) {
@@ -1796,7 +1789,7 @@ cgiFormResultType cgiCookieString(char *name, char *value, int space) {
       // Allow whitespace after semicolon
       while ((*p) && isspace(*p)) {
         p++;
-      } 
+      }
     }
   }
   // 2.01: actually the above loop never terminates except
@@ -2650,32 +2643,22 @@ static int LcgiFormDoubleBounded(lua_State *L) {
   return 1;
 }
 
+static int cgi_luaL_checktable(lua_State *L, int index) {
+  luaL_checktype(L, index, LUA_TTABLE);
+  return lua_objlen(L, index);
+}
+
 /* 1638: cgiFormResultType cgiFormSelectSingle(
-  char *name, char **choicesText, int choicesTotal, 
+  char *name, lua_State *L, int index, int choicesTotal,
   int *result, int defaultV
 )*/
 static int LcgiFormSelectSingle(lua_State *L) {
   char *name = (char *) luaL_checkstring(L, 1);
-
-  // Start: Copy lua table to C array
-  int index = 2;
-  luaL_checktype(L, index, LUA_TTABLE);
-  int size = lua_objlen(L, index);
-  char *choicesText[size];
-  int i;
-  for (i=1; i<=size; i++) {
-    lua_pushinteger(L, i);
-    lua_gettable(L, - (1 + index));
-    choicesText[i - 1] = (char *) lua_tostring(L, -1);
-    lua_pop(L, 1);
-  }
-  // End: Copy lua table to C array
-
+  int choicesTotal = cgi_luaL_checktable(L, 2);
   int defaultV = luaL_checkint(L, 3);
-  int choicesTotal = 3; // TODO
   int result;
-  cgiFormSelectSingle(name, choicesText, choicesTotal, &result, defaultV);
-  lua_pushinteger(L, ++result);
+  cgiFormSelectSingle(name, L, 2, choicesTotal, &result, defaultV);
+  lua_pushinteger(L, result);
   return 1;
 }
 
@@ -2745,6 +2728,7 @@ static struct luaL_Reg cgic[] = {
   {"formDoubleBounded", LcgiFormDoubleBounded},
   {"formSelectSingle", LcgiFormSelectSingle},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
+  {"formRadio", LcgiFormSelectSingle},
   {"headerCookieSetString", LcgiHeaderCookieSetString},
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
   {"headerContentType", LcgiHeaderContentType},
