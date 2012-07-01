@@ -46,7 +46,7 @@ function HandleSubmit()
 	Color()
 	--~ Flavors()
 	--~ NonExButtons()
-	--~ RadioButtons()
+	RadioButtons()
 	--~ File()
 	--~ Entries()
 	--~ Cookies()
@@ -128,36 +128,35 @@ end
 		--~ fprintf(cgic.cgiOut, "</ul>\n");
 	--~ }
 --~ }
---~ 
---~ char *ages[] = {
-	--~ "1",
-	--~ "2",
-	--~ "3",
-	--~ "4"
---~ };
---~ 
---~ void RadioButtons() {
-	--~ int ageChoice;
-	--~ char ageText[10];
-	--~ /* Approach #1: check for one of several valid responses. 
-		--~ Good if there are a short list of possible button values and
-		--~ you wish to enumerate them. */
-	--~ cgiFormRadio("age", ages, 4, &ageChoice, 0);
---~ 
-	--~ fprintf(cgic.cgiOut, "Age of Truck: %s (method #1)<BR>\n", 
-		--~ ages[ageChoice]);
---~ 
-	--~ /* Approach #2: just get the string. Good
-		--~ if the information is not critical or if you wish
-		--~ to verify it in some other way. Note that if
-		--~ the information is numeric, cgiFormInteger,
-		--~ cgiFormDouble, and related functions may be
-		--~ used instead of cgiFormString. */	
-	--~ cgiFormString("age", ageText, 10);
---~ 
-	--~ fprintf(cgic.cgiOut, "Age of Truck: %s (method #2)<BR>\n", ageText);
---~ }
---~ 
+
+function RadioButtons()
+  local ages = {
+    [[1]],
+    [[2]],
+    [[3]],
+    [[4]],
+  }
+
+  -- Approach #1: check for one of several valid responses. 
+  -- Good if there are a short list of possible button values and
+  -- you wish to enumerate them.
+  local ageChoice = cgic.formRadio("age", ages, 0);
+
+  print(([[Age of Truck: %s (method #1)<BR>
+]]):format(ages[ageChoice]))
+
+  -- Approach #2: just get the string. Good
+  -- if the information is not critical or if you wish
+  -- to verify it in some other way. Note that if
+  -- the information is numeric, cgiFormInteger,
+  -- cgiFormDouble, and related functions may be
+  -- used instead of cgiFormString.
+  local ageText = cgic.formString([[age]], 10)
+
+  print(([[Age of Truck: %s (method #2)<BR>
+]]):format(ageText))
+end
+
 --~ char *votes[] = {
 	--~ "A",
 	--~ "B",
