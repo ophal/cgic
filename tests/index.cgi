@@ -49,7 +49,7 @@ function HandleSubmit()
 	RadioButtons()
 	--~ File()
 	--~ Entries()
-	--~ Cookies()
+	Cookies()
 	-- The saveenvironment button, in addition to submitting the form,
   -- also saves the resulting CGI scenario to disk for later
   -- replay with the 'load saved environment' button.
@@ -234,44 +234,40 @@ end
 	--~ fprintf(cgic.cgiOut, "</ul>\n");
 	--~ cgiStringArrayFree(array);
 --~ }
---~ 
---~ void Cookies()
---~ {
-	--~ char **array, **arrayStep;
-	--~ char cname[1024], cvalue[1024];
-	--~ fprintf(cgic.cgiOut, "Cookies Submitted On This Call, With Values (Many Browsers NEVER Submit Cookies):<p>\n");
-	--~ if (cgiCookies(&array) != cgiFormSuccess) {
-		--~ return;
-	--~ }
-	--~ arrayStep = array;
-	--~ fprintf(cgic.cgiOut, "<table border=1>\n");
-	--~ fprintf(cgic.cgiOut, "<tr><th>Cookie<th>Value</tr>\n");
-	--~ while (*arrayStep) {
-		--~ char value[1024];
-		--~ fprintf(cgic.cgiOut, "<tr>");
-		--~ fprintf(cgic.cgiOut, "<td>");
-		--~ cgiHtmlEscape(*arrayStep);
-		--~ fprintf(cgic.cgiOut, "<td>");
-		--~ cgiCookieString(*arrayStep, value, sizeof(value));
-		--~ cgiHtmlEscape(value);
-		--~ fprintf(cgic.cgiOut, "\n");
-		--~ arrayStep++;
-	--~ }
-	--~ fprintf(cgic.cgiOut, "</table>\n");
-	--~ cgiFormString("cname", cname, sizeof(cname));	
-	--~ cgiFormString("cvalue", cvalue, sizeof(cvalue));	
-	--~ if (strlen(cname)) {
-		--~ fprintf(cgic.cgiOut, "New Cookie Set On This Call:<p>\n");
-		--~ fprintf(cgic.cgiOut, "Name: ");	
-		--~ cgiHtmlEscape(cname);
-		--~ fprintf(cgic.cgiOut, "Value: ");	
-		--~ cgiHtmlEscape(cvalue);
-		--~ fprintf(cgic.cgiOut, "<p>\n");
-		--~ fprintf(cgic.cgiOut, "If your browser accepts cookies (many do not), this new cookie should appear in the above list the next time the form is submitted.<p>\n"); 
-	--~ }
-	--~ cgiStringArrayFree(array);
---~ }
-	--~ 
+
+function Cookies()
+  local array, arrayStep = {}, {}
+  local cname, cvalue
+  local value
+  print [[Cookies Submitted On This Call, With Values (Many Browsers NEVER Submit Cookies):<p>
+]]
+  if cgic.cookies(array) ~= cgic.formSuccess then
+    return
+  end
+  arrayStep = array
+  print [[<table border=1>
+<tr><th>Cookie<th>Value</tr>
+]]
+  for k, v in pairs(arrayStep) do
+    value = cgic.cookieString(v, 1024)
+    print(([[<tr><td>%s</td><td>%s</td></tr>
+]]):format(cgic.htmlEscape(v), cgic.htmlEscape(value)))
+  end
+  print [[</table>
+]]
+  cname = cgic.formString([[cname]], 1024)
+  cvalue = cgic.formString([[cvalue]], 1024)
+  if cname:len() then
+    print [[New Cookie Set On This Call:<br />
+]]
+    print(([[Name: %s]]):format(cgic.htmlEscape(cname)))
+    print(([[Value: %s]]):format(cgic.htmlEscape(cvalue)))
+    print [[<br />]]
+    print [[If your browser accepts cookies (many do not), this new cookie should appear in the above list the next time the form is submitted.<p>
+]]
+  end
+end
+	
 --~ void File()
 --~ {
 	--~ cgiFilePtr file;
