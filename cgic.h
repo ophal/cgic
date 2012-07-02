@@ -207,7 +207,7 @@ extern cgiFormResultType cgiCookieInteger(
 	char *name, int *result, int defaultV
 );
 
-cgiFormResultType cgiCookies(char ***ptrToStringArray);
+cgiFormResultType cgiCookies(lua_State *L, int index);
 
 /**
  * path can be null or empty in which case a path of / (entire site) is set. 

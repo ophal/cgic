@@ -2367,8 +2367,8 @@ void cgiStringArrayFree(char **stringArray) {
   free(arrayItself);
 }  
 
-cgiFormResultType cgiCookies(char ***result) {
-  char **stringArray;
+cgiFormResultType cgiCookies(lua_State *L, int index) {
+  char *value;
   int i;
   int total = 0;
   char *p;
@@ -2380,15 +2380,7 @@ cgiFormResultType cgiCookies(char ***result) {
     }
     p++;
   }
-  stringArray = (char **) malloc(sizeof(char *) * (total + 1));
-  if (!stringArray) {
-    *result = 0;
-    return cgiFormMemory;
-  }
   // initialize all entries to null; the last will stay that way
-  for (i=0; (i <= total); i++) {
-    stringArray[i] = 0;
-  }
   i = 0;
   p = cgiCookie;
   while (*p) {
@@ -2400,15 +2392,17 @@ cgiFormResultType cgiCookies(char ***result) {
       p++;
     }
     if (p != n) {
-      stringArray[i] = (char *) malloc((p - n) + 1);
-      if (!stringArray[i]) {
-        cgiStringArrayFree(stringArray);
-        *result = 0;
+      value = (char *) malloc((p - n) + 1);
+      if (!value) {
+        free(value);
         return cgiFormMemory;
       }  
-      memcpy(stringArray[i], n, p - n);
-      stringArray[i][p - n] = '\0';
+      memcpy(value, n, p - n);
+      value[p - n] = '\0';
       i++;
+      lua_pushinteger(L, i);
+      lua_pushstring(L, value);
+      lua_settable(L, - (1 + index + 1));
     }
     while (*p && (*p != ';')) {
       p++;  
@@ -2420,7 +2414,6 @@ cgiFormResultType cgiCookies(char ***result) {
       p++;
     }
   }
-  *result = stringArray;
   return cgiFormSuccess;
 }
 
@@ -2696,6 +2689,13 @@ static int LcgiWriteEnvironment(lua_State *L) {
   return 0;
 }
 
+/* 2370: cgiFormResultType cgiCookies(char ***result) */
+static int LcgiCookies(lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_pushinteger(L, cgiCookies(L, 1));
+  return 1;
+}
+
 /* 2494: cgiHtmlEscape(char *s) */
 static int LcgiHtmlEscape(lua_State *L) {
   char *s = (char*) luaL_checkstring(L, 1);
@@ -2734,6 +2734,7 @@ static struct luaL_Reg cgic[] = {
   {"headerContentType", LcgiHeaderContentType},
   {"formString", LcgiFormString},
   {"writeEnvironment", LcgiWriteEnvironment},
+  {"cookies", LcgiCookies},
   {"htmlEscape", LcgiHtmlEscape},
   // Getters
   {"scriptName", LcgiScriptName},
