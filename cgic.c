@@ -2741,9 +2741,9 @@ static struct luaL_Reg cgic[] = {
   {"formSelectSingle", LcgiFormSelectSingle},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
   {"cookieString", LcgiCookieString},
-  {"formRadio", LcgiFormSelectSingle},
+  {"formRadio", LcgiFormSelectSingle}, // alias
   {"headerCookieSetString", LcgiHeaderCookieSetString},
-  {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
+  {"formSubmitClicked", LcgiFormCheckboxSingle}, // alias
   {"headerContentType", LcgiHeaderContentType},
   {"formString", LcgiFormString},
   {"writeEnvironment", LcgiWriteEnvironment},
