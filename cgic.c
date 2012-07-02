@@ -2662,6 +2662,18 @@ static int LcgiFormCheckboxSingle(lua_State *L) {
   return 1;
 }
 
+/* 1736: cgiFormResultType cgiCookieString(
+  char *name, char *value, int space
+)*/
+static int LcgiCookieString(lua_State *L) {
+  char *name = (char*) luaL_checkstring(L, 1);
+  int space = luaL_checkint(L, 2);
+  char result[space];
+  cgiCookieString(name, result, space);
+  lua_pushstring(L, result);
+  return 1;
+}
+
 /* 1858: cgiHeaderCookieSetString(
   char *name, char *value, int secondsToLive, char *path, char *domain
 )*/
@@ -2728,6 +2740,7 @@ static struct luaL_Reg cgic[] = {
   {"formDoubleBounded", LcgiFormDoubleBounded},
   {"formSelectSingle", LcgiFormSelectSingle},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
+  {"cookieString", LcgiCookieString},
   {"formRadio", LcgiFormSelectSingle},
   {"headerCookieSetString", LcgiHeaderCookieSetString},
   {"formSubmitClicked", LcgiFormCheckboxSingle}, // just an alias
