@@ -2667,7 +2667,7 @@ static int LcgiFormCheckboxSingle(lua_State *L) {
 )*/
 static int LcgiCookieString(lua_State *L) {
   char *name = (char*) luaL_checkstring(L, 1);
-  int space = luaL_checkint(L, 2);
+  int space = luaL_checkint(L, 2) + 1;
   char result[space];
   cgiCookieString(name, result, space);
   lua_pushstring(L, result);
