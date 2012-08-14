@@ -2757,7 +2757,11 @@ static struct luaL_Reg cgic[] = {
 LUALIB_API int luaopen_cgic(lua_State *L) {
   luaL_register(L, LIB_NAME, cgic);
   // Constants
+  lua_pushliteral(L, "version");	/** version */
+  lua_pushliteral(L, LIB_VERSION);
+  lua_settable(L, -3);
+  lua_pushliteral(L, "formSuccess");
   lua_pushinteger(L, cgiFormSuccess);
-  lua_setfield(L, -2, "formSuccess");
+  lua_settable(L, -3);
   return 1;
 }
