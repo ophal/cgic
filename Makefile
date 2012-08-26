@@ -1,6 +1,6 @@
-CFLAGS=-g -Wall
-LUA_CFLAGS=`pkg-config lua5.1 --cflags`
-CC=gcc
+CFLAGS= -g -Wall
+LUA_CFLAGS= `pkg-config lua5.1 --cflags`
+CC= gcc
 
 export SCRIPT_NAME:= index.cgi
 export REQUEST_METHOD:= post
@@ -13,12 +13,12 @@ install: cgic.so
 	cp cgic.so /usr/local/lib/lua/5.1/
 
 cgic.so:
-	$(CC) $(CFLAGS) $(LUA_CFLAGS) -O3 -fPIC -o cgic.o -c cgic.c
-	$(CC) -shared -O3 cgic.o -o cgic.so
+	$(CC) $(CFLAGS) $(LUA_CFLAGS) -O2 -fPIC    -c -o cgic.o cgic.c
+	$(CC) -o cgic.so   cgic.o -shared -lm
 
 test:
 	./tests/index.cgi < tests/post.dat
 
 clean:
-	rm -f *.o *.so
+	rm -f cgic.o cgic.so
 
