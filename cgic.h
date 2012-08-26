@@ -9,7 +9,7 @@
  * Site:   https://www.boutell.com/
  */
 
-// Make sure this is only included once.
+/* Make sure this is only included once. */
 #ifndef CGI_C
 #define CGI_C 1
 
@@ -270,5 +270,5 @@ cgiFormResultType cgiValueEscape(char *s);
  */
 cgiFormResultType cgiValueEscapeData(char *data, int len);
 
-#endif // CGI_C
+#endif /* CGI_C */
 

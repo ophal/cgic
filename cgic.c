@@ -18,10 +18,10 @@
 #define CGICDEBUGEND \
     fclose(dout); \
   }
-#else // CGICDEBUG
+#else /* CGICDEBUG */
 #define CGICDEBUGSTART
 #define CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -37,12 +37,12 @@
 #ifdef WIN32
 #include <io.h>
 
-// cgic 2.01
+/* cgic 2.01 */
 #include <fcntl.h>
 
 #else
 #include <unistd.h>
-#endif // WIN32
+#endif /* WIN32 */
 #include "cgic.h"
 
 #define cgiStrEq(a, b) (!strcmp((a), (b)))
@@ -98,24 +98,24 @@ typedef enum {
  */
 typedef struct cgiFormEntryStruct {
   char *attr;
-  // value is populated for regular form fields only.
-  // For file uploads, it points to an empty string, and file
-  // upload data should be read from the file tfileName. */ 
+  /* value is populated for regular form fields only.
+     For file uploads, it points to an empty string, and file
+     upload data should be read from the file tfileName. */ 
   char *value;
-  // When fileName is not an empty string, tfileName is not null,
-  // and 'value' points to an empty string.
+  /* When fileName is not an empty string, tfileName is not null,
+     and 'value' points to an empty string. */
 
-  // Valid for both files and regular fields; does not include
-  // terminating null of regular fields.
+  /* Valid for both files and regular fields; does not include
+     terminating null of regular fields. */
   int valueLength;
   char *fileName;  
   char *contentType;
-  // Temporary file name for working storage of file uploads.
+  /* Temporary file name for working storage of file uploads. */
   char *tfileName;
   struct cgiFormEntryStruct *next;
 } cgiFormEntry;
 
-// The first form entry.
+/* The first form entry. */
 static cgiFormEntry *cgiFormEntryFirst;
 
 static cgiParseResultType cgiParseGetFormInput();
@@ -146,16 +146,16 @@ int cgiInit() {
   cgiGetenv(&cgiAuthType, "AUTH_TYPE");
   cgiGetenv(&cgiRemoteUser, "REMOTE_USER");
   cgiGetenv(&cgiRemoteIdent, "REMOTE_IDENT");
-  // 2.0: the content type string needs to be parsed and modified, so
-  // copy it to a buffer.
+  /* 2.0: the content type string needs to be parsed and modified, so
+     copy it to a buffer. */
   e = getenv("CONTENT_TYPE");
   if (e) {
     if (strlen(e) < sizeof(cgiContentTypeData)) {
       strcpy(cgiContentType, e);
     }
     else {
-      // Truncate safely in the event of what is almost certainly
-      // a hack attempt
+      /* Truncate safely in the event of what is almost certainly
+         a hack attempt */
       strncpy(cgiContentType, e, sizeof(cgiContentTypeData));
       cgiContentType[sizeof(cgiContentTypeData) - 1] = '\0';
     }
@@ -163,12 +163,12 @@ int cgiInit() {
   else {
     cgiContentType[0] = '\0';
   }
-  // Never null
+  /* Never null */
   cgiMultipartBoundary = "";
-  // 2.0: parse semicolon-separated additional parameters of the
-  // content type. The one we're interested in is 'boundary'.
-  // We discard the rest to make cgiContentType more useful
-  // to the typical programmer.
+  /* 2.0: parse semicolon-separated additional parameters of the
+     content type. The one we're interested in is 'boundary'.
+     We discard the rest to make cgiContentType more useful
+     to the typical programmer. */
   if (strchr(cgiContentType, ';')) {
     char *sat = strchr(cgiContentType, ';');
     while (sat) {
@@ -204,13 +204,13 @@ int cgiInit() {
   fprintf(dout, "%s\n", cgiRequestMethod);
   fprintf(dout, "%s\n", cgiContentType);
   CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
 #ifdef WIN32
-  // 1.07: Must set stdin and stdout to binary mode
-  // 2.0: this is particularly crucial now and must not be removed
+  /* 1.07: Must set stdin and stdout to binary mode
+     2.0: this is particularly crucial now and must not be removed */
   _setmode( _fileno( stdin ), _O_BINARY );
   _setmode( _fileno( stdout ), _O_BINARY );
-#endif // WIN32
+#endif /* WIN32 */
   cgiFormEntryFirst = 0;
   cgiIn = stdin;
   cgiOut = stdout;
@@ -222,19 +222,19 @@ int cgiInit() {
     CGICDEBUGSTART
     fprintf(dout, "POST recognized\n");
     CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     if (cgiStrEqNc(cgiContentType, "application/x-www-form-urlencoded")) {  
 #ifdef CGICDEBUG
       CGICDEBUGSTART
       fprintf(dout, "Calling PostFormInput\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
       if (cgiParsePostFormInput() != cgiParseSuccess) {
 #ifdef CGICDEBUG
         CGICDEBUGSTART
         fprintf(dout, "PostFormInput failed\n");
         CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
         cgiExit();
         return -1;
       }  
@@ -242,20 +242,20 @@ int cgiInit() {
       CGICDEBUGSTART
       fprintf(dout, "PostFormInput succeeded\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     }
     else if (cgiStrEqNc(cgiContentType, "multipart/form-data")) {
 #ifdef CGICDEBUG
       CGICDEBUGSTART
       fprintf(dout, "Calling PostMultipartInput\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
       if (cgiParsePostMultipartInput() != cgiParseSuccess) {
 #ifdef CGICDEBUG
         CGICDEBUGSTART
         fprintf(dout, "PostMultipartInput failed\n");
         CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
         cgiExit();
         return -1;
       }  
@@ -263,19 +263,19 @@ int cgiInit() {
       CGICDEBUGSTART
       fprintf(dout, "PostMultipartInput succeeded\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     }
   }
   else if (cgiStrEqNc(cgiRequestMethod, "get")) {  
-    // The spec says this should be taken care of by
-    // the server, but... it isn't
+    /* The spec says this should be taken care of by
+       the server, but... it isn't */
     cgiContentLength = strlen(cgiQueryString);
     if (cgiParseGetFormInput() != cgiParseSuccess) {
 #ifdef CGICDEBUG
       CGICDEBUGSTART
       fprintf(dout, "GetFormInput failed\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
       cgiExit();
       return -1;
     }
@@ -284,7 +284,7 @@ int cgiInit() {
       CGICDEBUGSTART
       fprintf(dout, "GetFormInput succeeded\n");
       CGICDEBUGEND  
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     }
   }
   return 1;
@@ -323,20 +323,20 @@ static cgiParseResultType cgiParsePostFormInput() {
  * A simple memset(&mp, 0, sizeof(mp)) is suitable initialization.
  */
 typedef struct {
-  // Buffer for putting characters back
+  /* Buffer for putting characters back */
   char putback[1024];  
-  // Position in putback from which next character will be read.
-  // If readPos == writePos, then next character should
-  // come from cgiIn.
+  /* Position in putback from which next character will be read.
+     If readPos == writePos, then next character should
+     come from cgiIn. */
   int readPos;
-  // Position in putback to which next character will be put back.
-  // If writePos catches up to readPos, as opposed to the other
-  // way around, the stream no longer functions properly.
-  // Calling code must guarantee that no more than 
-  // sizeof(putback) bytes are put back at any given time.
+  /* Position in putback to which next character will be put back.
+     If writePos catches up to readPos, as opposed to the other
+     way around, the stream no longer functions properly.
+     Calling code must guarantee that no more than 
+     sizeof(putback) bytes are put back at any given time. */
   int writePos;
-  // Offset in the virtual datastream; can be compared
-  // to cgiContentLength
+  /* Offset in the virtual datastream; can be compared
+     to cgiContentLength */
   int offset;
 } mpStream, *mpStreamPtr;
 
@@ -354,8 +354,8 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len) {
       break;
     }  
   }
-  // Refuse to read past the declared length in order to
-  // avoid deadlock
+  /* Refuse to read past the declared length in order to
+     avoid deadlock */
   if (len > (cgiContentLength - mpp->offset)) {
     len = cgiContentLength - mpp->offset;
   }
@@ -370,7 +370,7 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len) {
       return got;
     }
     else {
-      // EOF or error
+      /* EOF or error */
       return fgot;
     }
   }
@@ -381,7 +381,7 @@ int mpRead(mpStreamPtr mpp, char *buffer, int len) {
     return EOF;
   }
   else {
-    // 2.01
+    /* 2.01 */
     return 0;
   }
 }
@@ -447,10 +447,10 @@ static cgiParseResultType cgiParsePostMultipartInput() {
   if (!cgiContentLength) {
     return cgiParseSuccess;
   }
-  //Read first boundary, including trailing newline
+  /* Read first boundary, including trailing newline */
   result = afterNextBoundary(mpp, 0, 0, 0, 1);
   if (result == cgiParseIO) {  
-    // An empty submission is not necessarily an error
+    /* An empty submission is not necessarily an error */
     return cgiParseSuccess;
   }
   else if (result != cgiParseSuccess) {
@@ -471,25 +471,25 @@ static cgiParseResultType cgiParsePostMultipartInput() {
     fcontentType[0] = 0;
     out = 0;
     outf = 0;
-    // Check for EOF
+    /* Check for EOF */
     got = mpRead(mpp, d, 2);
     if (got < 2) {
-      // Crude EOF
+      /* Crude EOF */
       break;
     }
     if ((d[0] == '-') && (d[1] == '-')) {
-      // Graceful EOF
+      /* Graceful EOF */
       break;
     }
     mpPutBack(mpp, d, 2);
-    // Read header lines until end of header
+    /* Read header lines until end of header */
     while (
       readHeaderLine(mpp, attr, sizeof(attr), value, sizeof(value))
     ) {
       char *argNames[3];
       char *argValues[2];
-      // Content-Disposition: form-data; 
-      // name="test"; filename="googley.gif"
+      /* Content-Disposition: form-data; 
+         name="test"; filename="googley.gif" */
       if (cgiStrEqNc(attr, "Content-Disposition")) {
         argNames[0] = "name";
         argNames[1] = "filename";
@@ -518,15 +518,15 @@ static cgiParseResultType cgiParsePostMultipartInput() {
       }
     }
     if (!cgiStrEqNc(fvalue, "form-data")) {
-      // Not form data
+      /* Not form data */
       continue;
     }
-    // Body is everything from here until the next 
-    // boundary. So, set it aside and move past boundary. 
-    // If a filename was submitted as part of the
-    // disposition header, store to a temporary file.
-    // Otherwise, store to a memory buffer (it is
-    // presumably a regular form field).
+    /* Body is everything from here until the next 
+       boundary. So, set it aside and move past boundary. 
+       If a filename was submitted as part of the
+       disposition header, store to a temporary file.
+       Otherwise, store to a memory buffer (it is
+       presumably a regular form field). */
     if (strlen(ffileName)) {
       if (getTempFileName(tfileName) != cgiParseSuccess) {
         return cgiParseIO;
@@ -539,7 +539,7 @@ static cgiParseResultType cgiParsePostMultipartInput() {
     }  
     result = afterNextBoundary(mpp, outf, &out, &bodyLength, 0);
     if (result != cgiParseSuccess) {
-      // Lack of a boundary here is an error.
+      /* Lack of a boundary here is an error. */
       if (outf) {
         fclose(outf);
         unlink(tfileName);
@@ -549,14 +549,14 @@ static cgiParseResultType cgiParsePostMultipartInput() {
       }
       return result;
     }
-    // OK, we have a new pair, add it to the list.
+    /* OK, we have a new pair, add it to the list. */
     n = (cgiFormEntry *) malloc(sizeof(cgiFormEntry));  
     if (!n) {
       goto outOfMemory;
     }
     memset(n, 0, sizeof(cgiFormEntry));
-    // 2.01: one of numerous new casts required
-    // to please C++ compilers
+    /* 2.01: one of numerous new casts required
+       to please C++ compilers */
     n->attr = (char *) malloc(strlen(fname) + 1);
     if (!n->attr) {
       goto outOfMemory;
@@ -632,14 +632,14 @@ outOfMemory:
 
 static cgiParseResultType getTempFileName(char *tfileName) {
 #ifndef WIN32
-  // Unix. Use the robust 'mkstemp' function to create
-  // a temporary file that is truly unique, with
-  // permissions that are truly safe. The 
-  // fopen-for-write destroys any bogus information
-  // written by potential hackers during the brief
-  // window between the file's creation and the
-  // chmod call (glibc 2.0.6 and lower might
-  // otherwise have allowed this).
+  /* Unix. Use the robust 'mkstemp' function to create
+     a temporary file that is truly unique, with
+     permissions that are truly safe. The 
+     fopen-for-write destroys any bogus information
+     written by potential hackers during the brief
+     window between the file's creation and the
+     chmod call (glibc 2.0.6 and lower might
+     otherwise have allowed this). */
   int outfd; 
   strcpy(tfileName, cgicTempDir "/cgicXXXXXX");
   outfd = mkstemp(tfileName);
@@ -647,13 +647,13 @@ static cgiParseResultType getTempFileName(char *tfileName) {
     return cgiParseIO;
   }
   close(outfd);
-  // Fix the permissions
+  /* Fix the permissions */
   if (chmod(tfileName, 0600) != 0) {
     unlink(tfileName);
     return cgiParseIO;
   }
 #else
-  // Non-Unix. Do what we can.
+  /* Non-Unix. Do what we can. */
   if (!tmpnam(tfileName)) {
     return cgiParseIO;
   }
@@ -704,10 +704,10 @@ cgiParseResultType afterNextBoundary(
   int boffset;
   int got;
   char d[2];  
-  // This is large enough, because the buffer into which the
-  // original boundary string is fetched is shorter by more
-  // than four characters due to the space required for
-  // the attribute name
+  /* This is large enough, because the buffer into which the
+     original boundary string is fetched is shorter by more
+     than four characters due to the space required for
+     the attribute name */
   char workingBoundaryData[1024];
   char *workingBoundary = workingBoundaryData;
   int workingBoundaryLength;
@@ -726,50 +726,50 @@ cgiParseResultType afterNextBoundary(
   while (1) {
     got = mpRead(mpp, d, 1);
     if (got != 1) {
-      // 2.01: cgiParseIO, not cgiFormIO
+      /* 2.01: cgiParseIO, not cgiFormIO */
       result = cgiParseIO;
       goto error;
     }
     if (d[0] == workingBoundary[boffset]) {
-      // We matched the next byte of the boundary.
-      // Keep track of our progress into the
-      // boundary and don't emit anything.
+      /* We matched the next byte of the boundary.
+         Keep track of our progress into the
+         boundary and don't emit anything. */
       boffset++;
       if (boffset == workingBoundaryLength) {
         break;
       } 
     }
     else if (boffset > 0) {
-      // We matched part, but not all, of the
-      // boundary. Now we have to be careful:
-      // put back all except the first
-      // character and try again. The 
-      // real boundary could begin in the
-      // middle of a false match. We can
-      // emit the first character only so far.
+      /* We matched part, but not all, of the
+         boundary. Now we have to be careful:
+         put back all except the first
+         character and try again. The 
+         real boundary could begin in the
+         middle of a false match. We can
+         emit the first character only so far. */
       BAPPEND(workingBoundary[0]);
       mpPutBack(mpp, workingBoundary + 1, boffset - 1);
       mpPutBack(mpp, d, 1);
       boffset = 0;
     }
     else {    
-      // Not presently in the middle of a boundary
-      // match; just emit the character.
+      /* Not presently in the middle of a boundary
+         match; just emit the character. */
       BAPPEND(d[0]);
     }  
   }
-  // Read trailing newline or -- EOF marker. A literal EOF here
-  // would be an error in the input stream.
+  /* Read trailing newline or -- EOF marker. A literal EOF here
+     would be an error in the input stream. */
   got = mpRead(mpp, d, 2);
   if (got != 2) {
     result = cgiParseIO;
     goto error;
   }  
   if ((d[0] == '\r') && (d[1] == '\n')) {
-    // OK, EOL
+    /* OK, EOL */
   }
   else if (d[0] == '-') {
-    // Probably EOF, but we check for that later
+    /* Probably EOF, but we check for that later */
     mpPutBack(mpp, d, 2);
   }  
   if (out && outSpace) {
@@ -777,9 +777,9 @@ cgiParseResultType afterNextBoundary(
     out[outLen] = '\0';
     out = (char *) realloc(out, outLen + 1);
     if (!out) {
-      // Surprising if it happens; and not fatal! We were
-      // just trying to give some space back. We can
-      // keep it if we have to.
+      /* Surprising if it happens; and not fatal! We were
+         just trying to give some space back. We can
+         keep it if we have to. */
       out = oout;
     }
     *outP = out;
@@ -828,7 +828,7 @@ static void decomposeValue(
   while (isspace(*value)) {
     value++;
   }
-  // Quoted mvalue
+  /* Quoted mvalue */
   if (*value == '\"') {
     value++;
     while ((*value) && (*value != '\"')) {
@@ -840,7 +840,7 @@ static void decomposeValue(
     }
   }
   else {
-    // Unquoted mvalue
+    /* Unquoted mvalue */
     while ((*value) && (*value != ';')) {
       APPEND(mvalue, *value);
       value++;
@@ -852,13 +852,13 @@ static void decomposeValue(
   while (*value == ';') {
     int argNum;
     int argValueLen = 0;
-    // Skip the ; between parameters
+    /* Skip the ; between parameters */
     value++;
-    // Now skip leading whitespace
+    /* Now skip leading whitespace */
     while ((*value) && (isspace(*value))) { 
       value++;
     }
-    // Now read the parameter name
+    /* Now read the parameter name */
     argNameLen = 0;
     while ((*value) && (isalnum(*value))) {
       APPEND(argName, *value);
@@ -871,14 +871,14 @@ static void decomposeValue(
       value++;
     }
     if (*value != '=') {
-      // Malformed line
+      /* Malformed line */
       return;  
     }
     value++;
     while ((*value) && isspace(*value)) {
       value++;
     }
-    // Find the parameter in the argument list, if present
+    /* Find the parameter in the argument list, if present */
     argNum = 0;
     argValue = 0;
     while (argNames[argNum]) {
@@ -888,7 +888,7 @@ static void decomposeValue(
       }
       argNum++;
     }    
-    // Finally, read the parameter value
+    /* Finally, read the parameter value */
     if (*value == '\"') {
       value++;
       while ((*value) && (*value != '\"')) {
@@ -902,7 +902,7 @@ static void decomposeValue(
       }
     }
     else {
-      // Unquoted value
+      /* Unquoted value */
       while ((*value) && (*value != ';')) {
         if (argNames[argNum]) {
           APPEND(argValue, *value);
@@ -1000,7 +1000,7 @@ static cgiUnescapeResultType cgiUnescapeChars(
 );
 
 static cgiParseResultType cgiParseFormInput(char *data, int length) {
-  // Scan for pairs, unescaping and storing them as they are found.
+  /* Scan for pairs, unescaping and storing them as they are found. */
   int pos = 0;
   cgiFormEntry *n;
   cgiFormEntry *l = 0;
@@ -1038,14 +1038,14 @@ static cgiParseResultType cgiParseFormInput(char *data, int length) {
       pos++;
       len++;
     }
-    // The last pair probably won't be followed by a &, but
-    // that's fine, so check for that after accepting it
+    /* The last pair probably won't be followed by a &, but
+       that's fine, so check for that after accepting it */
     if (cgiUnescapeChars(&value, data+start, len)
       != cgiUnescapeSuccess) {
       free(attr);
       return cgiParseMemory;
     }  
-    // OK, we have a new pair, add it to the list.
+    /* OK, we have a new pair, add it to the list. */
     n = (cgiFormEntry *) malloc(sizeof(cgiFormEntry));  
     if (!n) {
       free(attr);
@@ -1185,8 +1185,8 @@ static void cgiExit() {
     free(c);
     c = n;
   }
-  // If the cgi environment was restored from a saved environment,
-  // then these are in allocated space and must also be freed
+  /* If the cgi environment was restored from a saved environment,
+     then these are in allocated space and must also be freed */
   if (cgiRestored) {
     free(cgiServerSoftware);
     free(cgiServerName);
@@ -1208,8 +1208,8 @@ static void cgiExit() {
     free(cgiUserAgent);
     free(cgiReferrer);
   }
-  // 2.0: to clean up the environment for cgiReadEnvironment,
-  // we must set these correctly */
+  /* 2.0: to clean up the environment for cgiReadEnvironment,
+     we must set these correctly */
   cgiFormEntryFirst = 0;
   cgiRestored = 0;
 }
@@ -1390,9 +1390,9 @@ cgiFormResultType cgiFormStringMultiple(char *name, char ***result) {
   cgiFormEntry *e;
   int i;
   int total = 0;
-  // Make two passes. One would be more efficient, but this
-  // function is not commonly used. The select menu and
-  // radio box functions are faster.
+  /* Make two passes. One would be more efficient, but this
+     function is not commonly used. The select menu and
+     radio box functions are faster. */
   e = cgiFormEntryFindFirst(name);
   if (e != 0) {
     do {
@@ -1404,17 +1404,17 @@ cgiFormResultType cgiFormStringMultiple(char *name, char ***result) {
     *result = 0;
     return cgiFormMemory;
   }
-  // initialize all entries to null; the last will stay that way
+  /* initialize all entries to null; the last will stay that way */
   for (i=0; (i <= total); i++) {
     stringArray[i] = 0;
   }
-  // Now go get the entries
+  /* Now go get the entries */
   e = cgiFormEntryFindFirst(name);
 #ifdef CGICDEBUG
   CGICDEBUGSTART
   fprintf(dout, "StringMultiple Beginning\n");
   CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
   if (e) {
     i = 0;
     do {
@@ -1435,7 +1435,7 @@ cgiFormResultType cgiFormStringMultiple(char *name, char ***result) {
     CGICDEBUGSTART
     fprintf(dout, "StringMultiple Succeeding\n");
     CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     return cgiFormSuccess;
   }
   else {
@@ -1444,7 +1444,7 @@ cgiFormResultType cgiFormStringMultiple(char *name, char ***result) {
     CGICDEBUGSTART
     fprintf(dout, "StringMultiple found nothing\n");
     CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     return cgiFormNotFound;
   }  
 }
@@ -1473,19 +1473,19 @@ static cgiFormResultType cgiFormEntryString(
   sp = e->value;  
   while (1) {
     int ch;
-    // 1.07: don't check for available space now.
-    // We check for it immediately before adding
-    // an actual character. 1.06 handled the
-    // trailing null of the source string improperly,
-    // resulting in a cgiFormTruncated error.
+    /* 1.07: don't check for available space now.
+       We check for it immediately before adding
+       an actual character. 1.06 handled the
+       trailing null of the source string improperly,
+       resulting in a cgiFormTruncated error. */
     ch = *sp;
 
-    // Fix the CR/LF, LF, CR nightmare: watch for
-    // consecutive bursts of CRs and LFs in whatever
-    // pattern, then actually output the larger number 
-    // of LFs. Consistently sane, yet it still allows
-    // consecutive blank lines when the user
-    // actually intends them.
+    /* Fix the CR/LF, LF, CR nightmare: watch for
+       consecutive bursts of CRs and LFs in whatever
+       pattern, then actually output the larger number 
+       of LFs. Consistently sane, yet it still allows
+       consecutive blank lines when the user
+       actually intends them. */
     if ((ch == 13) || (ch == 10)) {
       if (ch == 13) {
         crCount++;
@@ -1518,12 +1518,12 @@ static cgiFormResultType cgiFormEntryString(
         lfCount = 0;
       }
       if (ch == '\0') {
-        // The end of the source string
+        /* The end of the source string */
         break;        
       }  
-      // 1.06: check available space before adding
-      // the character, because a previously added
-      // LF may have brought us to the limit
+      /* 1.06: check available space before adding
+         the character, because a previously added
+         LF may have brought us to the limit */
       if (len >= avail) {
         truncated = 1;
         break;
@@ -1645,7 +1645,7 @@ cgiFormResultType cgiFormSelectSingle(
   CGICDEBUGSTART
   fprintf(dout, "%d\n", (int) e);
   CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
   if (!e) {
     *result = defaultV;
     return cgiFormNotFound;
@@ -1655,7 +1655,7 @@ cgiFormResultType cgiFormSelectSingle(
     CGICDEBUGSTART
     fprintf(dout, "%s %s\n", (char *) lua_tostring(L, -1), e->value);
     CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
     lua_pushinteger(L, i);
     lua_gettable(L, - (1 + index));
     if (cgiStrEq((char *) lua_tostring(L, -1), e->value)) {
@@ -1663,7 +1663,7 @@ cgiFormResultType cgiFormSelectSingle(
       CGICDEBUGSTART
       fprintf(dout, "MATCH\n");
       CGICDEBUGEND
-#endif // CGICDEBUG
+#endif /* CGICDEBUG */
       *result = i;
       return cgiFormSuccess;
     }
@@ -1727,7 +1727,7 @@ extern cgiFormResultType cgiFormCheckboxMultiple(
   char *name, char **valuesText, int valuesTotal,
   int *result, int *invalid
 ) {
-  // Implementation is identical to cgiFormSelectMultiple.
+  /* Implementation is identical to cgiFormSelectMultiple. */
   return cgiFormSelectMultiple(
     name, valuesText, valuesTotal, result, invalid
   );
@@ -1737,15 +1737,15 @@ cgiFormResultType cgiCookieString(char *name, char *value, int space) {
   char *p = cgiCookie;
   while (*p) {
     char *n = name;
-    // 2.02: if cgiCookie is exactly equal to name, this
-    // can cause an overrun. The server probably wouldn't
-    // allow it, since a name without values makes no sense 
-    // -- but then again it might not check, so this is a
-    // genuine security concern. Thanks to Nicolas 
-    // Tomadakis.
+    /* 2.02: if cgiCookie is exactly equal to name, this
+       can cause an overrun. The server probably wouldn't
+       allow it, since a name without values makes no sense 
+       -- but then again it might not check, so this is a
+       genuine security concern. Thanks to Nicolas 
+       Tomadakis. */
     while (*p == *n) {
       if ((p == '\0') && (n == '\0')) {
-        // Malformed cookie header from client
+        /* Malformed cookie header from client */
         return cgiFormNotFound;
       }
       p++;
@@ -1762,7 +1762,7 @@ cgiFormResultType cgiCookieString(char *name, char *value, int space) {
       if (space > 0) {
         *value = '\0';
       }
-      // Correct parens: 2.02. Thanks to Mathieu Villeneuve-Belair.
+      /* Correct parens: 2.02. Thanks to Mathieu Villeneuve-Belair. */
       if (!(((*p) == ';') || ((*p) == '\0'))) {
         return cgiFormTruncated;
       }
@@ -1771,7 +1771,7 @@ cgiFormResultType cgiCookieString(char *name, char *value, int space) {
       }
     }
     else {
-      // Skip to next cookie
+      /* Skip to next cookie */
       while (*p) {
         if (*p == ';') {
           break;
@@ -1779,21 +1779,21 @@ cgiFormResultType cgiCookieString(char *name, char *value, int space) {
         p++;
       }
       if (!*p) {
-        // 2.01: default to empty
+        /* 2.01: default to empty */
         if (space) {
           *value = '\0';
         }
         return cgiFormNotFound;
       }
       p++;  
-      // Allow whitespace after semicolon
+      /* Allow whitespace after semicolon */
       while ((*p) && isspace(*p)) {
         p++;
       }
     }
   }
-  // 2.01: actually the above loop never terminates except
-  // with a return, but do this to placate gcc
+  /* 2.01: actually the above loop never terminates except
+     with a return, but do this to placate gcc */
   if (space) {
     *value = '\0';
   }
@@ -1850,15 +1850,15 @@ char *months[] = {
 void cgiHeaderCookieSetString(
   char *name, char *value, int secondsToLive, char *path, char *domain
 ) {
-  // cgic 2.02: simpler and more widely compatible implementation.
-  // Thanks to Chunfu Lai. 
-  // cgic 2.03: yes, but it didn't work. Reimplemented by
-  // Thomas Boutell. ; after last element was a bug. 
-  // Examples of real world cookies that really work:
-  // Set-Cookie: MSNADS=UM=; domain=.slate.com; 
-  //   expires=Tue, 26-Apr-2022 19:00:00 GMT; path=/
-  // Set-Cookie: MC1=V=3&ID=b5bc08af2b8a43ff85fcb5efd8b238f0; 
-  //   domain=.slate.com; expires=Mon, 04-Oct-2021 19:00:00 GMT; path=/
+  /* cgic 2.02: simpler and more widely compatible implementation.
+     Thanks to Chunfu Lai. 
+     cgic 2.03: yes, but it didn't work. Reimplemented by
+     Thomas Boutell. ; after last element was a bug. 
+     Examples of real world cookies that really work:
+     Set-Cookie: MSNADS=UM=; domain=.slate.com; 
+       expires=Tue, 26-Apr-2022 19:00:00 GMT; path=/
+     Set-Cookie: MC1=V=3&ID=b5bc08af2b8a43ff85fcb5efd8b238f0; 
+       domain=.slate.com; expires=Mon, 04-Oct-2021 19:00:00 GMT; path=/ */
   time_t now;
   time_t then;
   struct tm *gt;
@@ -1904,10 +1904,10 @@ static int cgiWriteInt(FILE *out, int i);
 cgiEnvironmentResultType cgiWriteEnvironment(char *filename) {
   FILE *out;
   cgiFormEntry *e;
-  // Be sure to open in binary mode
+  /* Be sure to open in binary mode */
   out = fopen(filename, "wb");
   if (!out) {
-    // Can't create file
+    /* Can't create file */
     return cgiEnvironmentIO;
   }
   if (!cgiWriteString(out, "CGIC2.0")) {
@@ -1985,7 +1985,7 @@ cgiEnvironmentResultType cgiWriteEnvironment(char *filename) {
     if (!cgiWriteString(out, e->value)) {
       goto error;
     }
-    // New 2.0 fields and file uploads
+    /* New 2.0 fields and file uploads */
     if (!cgiWriteString(out, e->fileName)) {
       goto error;
     }
@@ -2025,9 +2025,9 @@ cgiEnvironmentResultType cgiWriteEnvironment(char *filename) {
   return cgiEnvironmentSuccess;
 error:
   fclose(out);
-  // If this function is not defined in your system,
-  // you must substitute the appropriate 
-  // file-deletion function.
+  /* If this function is not defined in your system,
+     you must substitute the appropriate 
+     file-deletion function. */
   unlink(filename);
   return cgiEnvironmentIO;
 }
@@ -2056,25 +2056,25 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
   FILE *in;
   cgiFormEntry *e = 0, *p;
   char *version;
-  // Prevent compiler warnings
+  /* Prevent compiler warnings */
   cgiEnvironmentResultType result = cgiEnvironmentIO;
-  // Free any existing data first
+  /* Free any existing data first */
   cgiExit();
-  // Be sure to open in binary mode
+  /* Be sure to open in binary mode */
   in = fopen(filename, "rb");
   if (!in) {
-    // Can't access file
+    /* Can't access file */
     return cgiEnvironmentIO;
   }
   if (!cgiReadString(in, &version)) {
     goto error;
   }
   if (strcmp(version, "CGIC" CGIC_VERSION)) {
-    // 2.02: Merezko Oleg
+    /* 2.02: Merezko Oleg */
     free(version);
     return cgiEnvironmentWrongVersion;
   }  
-  // 2.02: Merezko Oleg
+  /* 2.02: Merezko Oleg */
   free(version);
   if (!cgiReadString(in, &cgiServerSoftware)) {
     goto error;
@@ -2133,7 +2133,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
   if (!cgiReadString(in, &cgiReferrer)) {
     goto error;
   }
-  // 2.0
+  /* 2.0 */
   if (!cgiReadString(in, &cgiCookie)) {
     goto error;
   }
@@ -2151,8 +2151,8 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
     }
     memset(e, 0, sizeof(cgiFormEntry));
     if (!cgiReadString(in, &e->attr)) {
-      // This means we've reached the end of the list.
-      // 2.02: thanks to Merezko Oleg
+      /* This means we've reached the end of the list.
+         2.02: thanks to Merezko Oleg */
       free(e);
       break;
     }
@@ -2187,9 +2187,9 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
         goto error;
       }
       while (len > 0) {    
-        // 2.01: try is a bad variable name in
-        // C++, and it wasn't being used
-        // properly either
+        /* 2.01: try is a bad variable name in
+           C++, and it wasn't being used
+           properly either */
         int tryr = len;
         if (tryr > ((int) sizeof(buffer))) {
           tryr = sizeof(buffer);
@@ -2209,7 +2209,7 @@ cgiEnvironmentResultType cgiReadEnvironment(char *filename) {
         }
         len -= got;
       }
-      // cgic 2.05: should be fclose not rewind
+      /* cgic 2.05: should be fclose not rewind */
       fclose(out);
       e->tfileName = (char *) malloc((int) strlen(tfileName) + 1);
       if (!e->tfileName) {
@@ -2265,7 +2265,7 @@ error:
 
 static int cgiReadString(FILE *in, char **s) {
   int len;
-  // 2.0 fix: test cgiReadInt for failure!
+  /* 2.0 fix: test cgiReadInt for failure! */
   if (!cgiReadInt(in, &len)) {
     return 0;
   }
@@ -2363,7 +2363,7 @@ void cgiStringArrayFree(char **stringArray) {
     stringArray++;
     p = *stringArray;
   }
-  // 2.0: free the array itself!
+  /* 2.0: free the array itself! */
   free(arrayItself);
 }  
 
@@ -2380,7 +2380,7 @@ cgiFormResultType cgiCookies(lua_State *L, int index) {
     }
     p++;
   }
-  // initialize all entries to null; the last will stay that way
+  /* initialize all entries to null; the last will stay that way */
   i = 0;
   p = cgiCookie;
   while (*p) {
@@ -2424,8 +2424,8 @@ cgiFormResultType cgiFormEntries(char ***result) {
   int total = 0;
   e = cgiFormEntryFirst;
   while (e) {
-    // Don't count a field name more than once if
-    // multiple values happen to be present for it
+    /* Don't count a field name more than once if
+       multiple values happen to be present for it */
     pe = cgiFormEntryFirst;
     while (pe != e) {
       if (!strcmp(e->attr, pe->attr)) {
@@ -2442,17 +2442,17 @@ skipSecondValue:
     *result = 0;
     return cgiFormMemory;
   }
-  // initialize all entries to null; the last will stay that way
+  /* initialize all entries to null; the last will stay that way */
   for (i=0; (i <= total); i++) {
     stringArray[i] = 0;
   }
-  // Now go get the entries
+  /* Now go get the entries */
   e = cgiFormEntryFirst;
   i = 0;
   while (e) {
     int space;
-    // Don't return a field name more than once if
-    // multiple values happen to be present for it
+    /* Don't return a field name more than once if
+       multiple values happen to be present for it */
     pe = cgiFormEntryFirst;
     while (pe != e) {
       if (!strcmp(e->attr, pe->attr)) {
@@ -2463,7 +2463,7 @@ skipSecondValue:
     space = (int) strlen(e->attr) + 1;
     stringArray[i] = (char *) malloc(space);
     if (stringArray[i] == 0) {
-      // Memory problems
+      /* Memory problems */
       cgiStringArrayFree(stringArray);
       *result = 0;
       return cgiFormMemory;
@@ -2483,16 +2483,16 @@ skipSecondValue2:
       return cgiFormIO; \
     } \
   } 
-// TODO: improve performance, realloc() is slow
+/* TODO: improve performance, realloc() is slow */
 cgiFormResultType cgiHtmlEscapeData(char **data, int len) {
-  int cs = 256; // chunk size
-  int cn = 0; // number of chunks
-  char *s = *data; // data
-  char *e = malloc(0); // escaped data
-  int p = -1; // pointer
+  int cs = 256; /* chunk size */
+  int cn = 0; /* number of chunks */
+  char *s = *data; /* data */
+  char *e = malloc(0); /* escaped data */
+  int p = -1; /* pointer */
 
   while (len--) {
-    // Resize string
+    /* Resize string */
     if (p >= cs*cn - 6) {
       cn++;
       e = realloc(e, cn*cs);
@@ -2500,7 +2500,7 @@ cgiFormResultType cgiHtmlEscapeData(char **data, int len) {
         return cgiFormIO;
       }
     }
-    // Escape string
+    /* Escape string */
     if (*s == '<') {
       p = p + 4;
       e[p - 3] = '&';
@@ -2530,7 +2530,7 @@ cgiFormResultType cgiHtmlEscapeData(char **data, int len) {
     s++;
   }
   e[++p] = '\0';
-  // Copy escaped data
+  /* Copy escaped data */
   *data = malloc(p);
   strcpy(*data, e);
   free(e);
@@ -2732,7 +2732,7 @@ static int LcgiScriptName(lua_State *L) {
  **/
 
 static struct luaL_Reg cgic[] = {
-  // Calls
+  /* Calls */
   {"init", LcgiInit},
   {"exit", LcgiExit},
   {"formStringNoNewlines", LcgiFormStringNoNewlines},
@@ -2741,22 +2741,22 @@ static struct luaL_Reg cgic[] = {
   {"formSelectSingle", LcgiFormSelectSingle},
   {"formCheckboxSingle", LcgiFormCheckboxSingle},
   {"cookieString", LcgiCookieString},
-  {"formRadio", LcgiFormSelectSingle}, // alias
+  {"formRadio", LcgiFormSelectSingle}, /* alias */
   {"headerCookieSetString", LcgiHeaderCookieSetString},
-  {"formSubmitClicked", LcgiFormCheckboxSingle}, // alias
+  {"formSubmitClicked", LcgiFormCheckboxSingle}, /* alias */
   {"headerContentType", LcgiHeaderContentType},
   {"formString", LcgiFormString},
   {"writeEnvironment", LcgiWriteEnvironment},
   {"cookies", LcgiCookies},
   {"htmlEscape", LcgiHtmlEscape},
-  // Getters
+  /* Getters */
   {"scriptName", LcgiScriptName},
   {NULL, NULL}
 };
 
 LUALIB_API int luaopen_cgic(lua_State *L) {
   luaL_register(L, LIB_NAME, cgic);
-  // Constants
+  /* Constants */
   lua_pushliteral(L, "version");	/** version */
   lua_pushliteral(L, LIB_VERSION);
   lua_settable(L, -3);
